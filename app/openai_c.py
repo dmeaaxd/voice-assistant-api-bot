@@ -3,24 +3,11 @@ import time
 
 import dotenv
 from openai import OpenAI
-from pydub.utils import mediainfo
 
 dotenv.load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-
-def generate_audio(text: str):
-    speech_file_path = "speech.ogg"
-    response = client.audio.speech.create(
-        model="tts-1",
-        voice="alloy",
-        input=text
-    )
-    response.stream_to_file(speech_file_path)
-    info = mediainfo(speech_file_path)
-
-    return int(float(info['duration']))
 
 
 def create_thread():

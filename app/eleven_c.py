@@ -2,7 +2,6 @@ import os
 
 from elevenlabs import ElevenLabs
 from mutagen.mp3 import MP3
-from pydub.utils import mediainfo
 
 from app import utils
 
