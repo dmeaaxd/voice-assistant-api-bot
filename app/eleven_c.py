@@ -9,7 +9,7 @@ def tts(text):
     print(text, type(text))
     audio = client.generate(
         text=text,
-        voice='21m00Tcm4TlvDq8ikWAM',
+        voice='JJhISFzXutRuYXDTm19w',
         model="eleven_multilingual_v2",
         output_format="mp3_22050_32",
     )
