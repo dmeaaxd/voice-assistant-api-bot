@@ -1,5 +1,7 @@
 #!/bin/sh
 
+brew install ffmpeg
+
 # Установка зависимостей
 echo "Установка зависимостей..."
 pip install -r requirements.txt
