@@ -1,6 +1,7 @@
 import os
 
 from elevenlabs import ElevenLabs
+from mutagen.mp3 import MP3
 from pydub.utils import mediainfo
 
 from app import utils
@@ -22,5 +23,9 @@ def tts(text):
                 f.write(chunk)
         f.close()
     # utils.convert_mp3_to_ogg(filename, f'speech.ogg')
-    info = mediainfo(f'speech.mp3')
-    return int(float(info['duration']))
+    # info = mediainfo(f'speech.mp3')
+    # return int(float(info['duration']))
+
+    audio_info = MP3(f'speech.mp3')
+    duration = int(audio_info.info.length)
+    return duration
