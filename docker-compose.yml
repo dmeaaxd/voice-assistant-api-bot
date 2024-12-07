@@ -4,4 +4,4 @@ services:
   app:
     build: .
     restart: always
-    entrypoint: /bin/sh -c './entrypoint.sh'
+    entrypoint: chmod 777 ./entrypoint.sh & /bin/sh -c './entrypoint.sh'
