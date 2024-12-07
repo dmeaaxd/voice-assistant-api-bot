@@ -3,8 +3,6 @@ import os
 from elevenlabs import ElevenLabs
 from mutagen.mp3 import MP3
 
-from app import utils
-
 
 def tts(text):
     client = ElevenLabs(api_key=os.getenv('XI_API_KEY'))
