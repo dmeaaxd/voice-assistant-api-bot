@@ -15,8 +15,8 @@ DATABASE_URL = (
 )
 
 # Создание engine и сессии
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = create_engine(DATABASE_URL, isolation_level="REPEATABLE READ")
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
 Base = declarative_base()
 
 
@@ -45,40 +45,45 @@ def get_db():
 # Создание
 def create_thread(chat_id: int, thread_id: str):
     with get_db() as db:
-        db_thread = Thread(chat_id=chat_id, thread_id=thread_id)
-        db.add(db_thread)
-        db.commit()
-        db.refresh(db_thread)
-        return db_thread
+        with db.begin():
+            db_thread = Thread(chat_id=chat_id, thread_id=thread_id)
+            db.add(db_thread)
+            db.commit()
+            db.refresh(db_thread)
+            return db_thread
 
 
 # Чтение
 def get_thread(chat_id: int):
     with get_db() as db:
-        return db.query(Thread).filter(Thread.chat_id == chat_id).first().thread_id
+        with db.begin():
+            return db.query(Thread).filter(Thread.chat_id == chat_id).first().thread_id
 
 
 def get_all_threads():
     with get_db() as db:
-        return db.query(Thread).all()
+        with db.begin():
+            return db.query(Thread).all()
 
 
 # Обновление
 def update_thread(thread_id: str, chat_id: int):
     with get_db() as db:
-        db_thread = db.query(Thread).filter(Thread.thread_id == thread_id).first()
-        if db_thread:
-            db_thread.chat_id = chat_id
-            db.commit()
-            db.refresh(db_thread)
-        return db_thread
+        with db.begin():
+            db_thread = db.query(Thread).filter(Thread.thread_id == thread_id).first()
+            if db_thread:
+                db_thread.chat_id = chat_id
+                db.commit()
+                db.refresh(db_thread)
+            return db_thread
 
 
 # Удаление
 def delete_thread(chat_id: int):
     with get_db() as db:
-        db_thread = db.query(Thread).filter(Thread.chat_id == chat_id).first()
-        if db_thread:
-            db.delete(db_thread)
-            db.commit()
-        return db_thread
+        with db.begin():
+            db_thread = db.query(Thread).filter(Thread.chat_id == chat_id).first()
+            if db_thread:
+                db.delete(db_thread)
+                db.commit()
+            return db_thread
