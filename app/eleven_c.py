@@ -1,15 +1,19 @@
 import os
 
+import dotenv
 from elevenlabs import ElevenLabs
 from mutagen.mp3 import MP3
 
+dotenv.load_dotenv()
+
+voice_id = os.getenv('VOICE_ID')
 
 def tts(text):
     client = ElevenLabs(api_key=os.getenv('XI_API_KEY'))
     print(text, type(text))
     audio = client.generate(
         text=text,
-        voice='JJhISFzXutRuYXDTm19w',
+        voice=voice_id,
         model="eleven_multilingual_v2",
         output_format="mp3_22050_32",
     )
