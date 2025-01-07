@@ -3,11 +3,13 @@ import time
 
 import dotenv
 from openai import OpenAI
+import openai
 
 dotenv.load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 def create_thread():
@@ -41,3 +43,16 @@ def generate(thread_id, text):
     thread_messages = client.beta.threads.messages.list(thread_id)
 
     return thread_messages.data[0].content[0].text.value
+
+
+async def transcribe_audio(file_path: str):
+    try:
+        with open(file_path, 'rb') as audio_file:
+            response = client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file
+            )
+            return response.text
+    except Exception as e:
+        print(f"Ошибка при распознавании: {e}")
+        return

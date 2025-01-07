@@ -6,7 +6,6 @@ from os import getenv
 from pathlib import Path
 
 import dotenv
-import whisper
 from aiogram import Bot, Dispatcher, html, Router
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -14,6 +13,7 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message, FSInputFile, File
 
 from app import openai_c, db, eleven_c
+from app.openai_c import transcribe_audio
 
 dotenv.load_dotenv()
 TOKEN = getenv("BOT_TOKEN")
@@ -23,7 +23,6 @@ dp = Dispatcher()
 router = Router()
 dp.include_router(router)
 
-whisper_model = whisper.load_model("base")
 
 
 async def handle_file(file: File, file_name: str, path: str):
@@ -40,26 +39,19 @@ async def voice_message_handler(message: Message):
 
     await handle_file(file=voice, file_name=file_name, path=path)
 
-    try:
-        result = whisper_model.transcribe(file_path)
-        recognized_text = result.get("text", "").strip()
+    recognized_text = await transcribe_audio(file_path)
 
-        if recognized_text:
-            await bot.send_chat_action(message.chat.id, 'record_voice')
+    if recognized_text:
+        await bot.send_chat_action(message.chat.id, 'record_voice')
 
-            thread = db.get_thread(message.chat.id)
-            bot_response = openai_c.generate(thread, recognized_text)
+        thread = db.get_thread(message.chat.id)
+        bot_response = openai_c.generate(thread, recognized_text)
 
-            # Генерация голосового ответа
-            duration = eleven_c.tts(bot_response)
+        duration = eleven_c.tts(bot_response)
 
-            # Отправляем голосовой ответ
-            await message.answer_voice(FSInputFile(f"speech.mp3"), duration=duration)
+        await message.answer_voice(FSInputFile(f"speech.mp3"), duration=duration)
 
-        else:
-            await message.answer("Я не понял ваше голосовое сообщение")
-    except Exception as e:
-        logging.error(f"Ошибка при распознавании: {e}")
+    else:
         await message.answer("Я не понял ваше голосовое сообщение")
 
     os.remove(file_path)
