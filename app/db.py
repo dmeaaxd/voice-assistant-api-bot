@@ -15,7 +15,7 @@ DATABASE_URL = (
 )
 
 # Создание engine и сессии
-engine = create_engine(DATABASE_URL, isolation_level="READ COMMITTED")
+engine = create_engine(DATABASE_URL, isolation_level="REPEATABLE READ")
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
 Base = declarative_base()
 

@@ -23,9 +23,7 @@ def tts(text):
             if chunk:
                 f.write(chunk)
         f.close()
-    # utils.convert_mp3_to_ogg(filename, f'speech.ogg')
-    # info = mediainfo(f'speech.mp3')
-    # return int(float(info['duration']))
+
 
     audio_info = MP3(f'speech.mp3')
     duration = int(audio_info.info.length)
